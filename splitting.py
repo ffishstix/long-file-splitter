@@ -102,10 +102,8 @@ def getInfo():
                 isValid = True
 
     arr.append(toLocation)
-        
-    
-    
     return arr
+
 def randomVar(length=8):
     letters = string.ascii_lowercase
     resultStr = ''.join(random.choice(letters) for i in range(length))
@@ -131,15 +129,17 @@ def readInChunks(file, chunk_size=23000):
             break
         yield data
 
-temp = getInfo()
-file = temp[0]
-size = temp[1]
-toLocation = temp[2]
-count = 0
-with open(file) as f:
-    for piece in readInChunks(f):
-        count += 1
-        place(piece, toLocation, count)
+
     
 def mainloop():
-    print()
+    temp = getInfo()
+    file = temp[0]
+    size = temp[1]
+    toLocation = temp[2]
+    count = 0
+    with open(file) as f:
+        for piece in readInChunks(f):
+            count += 1
+            place(piece, toLocation, count)
+
+mainloop()
