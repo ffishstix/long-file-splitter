@@ -99,7 +99,16 @@ def getInfo():
                           1, i create the folder for you
                           2, you got it wrong and would like to input it again """)
                 if x == 1:
-                    print()
+                    Path(toLocation).mkdir(parents=True, exist_ok=True)
+                    isvalid = True
+        else:
+            print("press enter to continue with default")
+            print("or press any key and then press enter to reenter")
+            x = input("> ")
+            if not toLocation or toLocation.strip() == "":
+                toLocation = "C:/appdata/python"
+
+
         
     
     
@@ -108,7 +117,7 @@ def randomVar(length=8):
     letters = string.ascii_lowercase
     resultStr = ''.join(random.choice(letters) for i in range(length))
     return resultStr
-def place(chunk, toLocation="C:/appdata/python", count=0):
+def place(chunk, toLocation, count=0):
     if not os.path.exists(toLocation):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
         
