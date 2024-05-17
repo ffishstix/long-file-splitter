@@ -44,10 +44,7 @@ def getInfo():
         if not final or final.strip() == "":
             y = input("Enter file location> ")
             x = input("Enter file name> ")
-
-            if not x or x.strip() == "" and not y or y.strip() == "":
-                final = "C:/Users/finla/Downloads/y-cruncher v0.8.4.9538a/y-cruncher v0.8.4.9538a/Pi - Dec - Chudnovsky.txt" # me use only
-                isValid = True
+            
             if os.path.isdir(y) and os.path.isfile(os.path.join(y, x)):
                 final = os.path.join(y, x)
                 isValid = True
@@ -75,7 +72,7 @@ def randomVar(length=8):
     letters = string.ascii_lowercase
     resultStr = ''.join(random.choice(letters) for i in range(length))
     return resultStr
-def place(chunk, toLocation="C:/temp/python", count=0):
+def place(chunk, toLocation, count=0):
     if not os.path.exists(toLocation):
         if os.path.exists("C:"):
             os.mkdir(toLocation)
@@ -93,7 +90,7 @@ def place(chunk, toLocation="C:/temp/python", count=0):
     print(chunk[0:20])
     print("placed")        
 
-def readInChunks(file="C:/Users/finla/Downloads/y-cruncher v0.8.4.9538a/y-cruncher v0.8.4.9538a/Pi - Dec - Chudnovsky.txt", chunk_size=23000):
+def readInChunks(file, chunk_size=23000):
     """Lazy function (generator) to read a file piece by piece.
     Default chunk size: 23k."""
     while True:
@@ -112,3 +109,5 @@ with open(file) as f:
         count += 1
         place(piece, toLocation, count)
     
+def mainloop():
+    print()
