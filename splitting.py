@@ -2,6 +2,7 @@ import os
 import time
 import string
 import random
+from pathlib import Path
 def getInfo():
 
     """while not isValid:
@@ -44,7 +45,7 @@ def getInfo():
         if not final or final.strip() == "":
             y = input("Enter file location> ")
             x = input("Enter file name> ")
-            
+
             if os.path.isdir(y) and os.path.isfile(os.path.join(y, x)):
                 final = os.path.join(y, x)
                 isValid = True
@@ -74,25 +75,19 @@ def randomVar(length=8):
     return resultStr
 def place(chunk, toLocation, count=0):
     if not os.path.exists(toLocation):
-        if os.path.exists("C:"):
-            os.mkdir(toLocation)
-        else:
-            print("programdata file does not exist, must be on windows and C:")
-            time.sleep(0.5)
-            exit(420)
+        Path(toLocation).mkdir(parents=True, exist_ok=True)
+        
+    print("test")    
     fileName = os.path.join(toLocation, "pi-part" + str(count) + randomVar(8))
     while os.path.isfile(fileName):
         fileName = os.path.join(toLocation, "pi-part" + str(count) + randomVar(8))
     j = open(fileName, "x")   
     j.write(chunk)
-    j.flush()
     j.close()
     print(chunk[0:20])
     print("placed")        
 
 def readInChunks(file, chunk_size=23000):
-    """Lazy function (generator) to read a file piece by piece.
-    Default chunk size: 23k."""
     while True:
         data = file.read(chunk_size)
         if not data:
@@ -103,7 +98,7 @@ temp = getInfo()
 file = temp[0]
 size = temp[1]
 count = 0
-toLocation = "C:/temp/python"
+toLocation = "C:/appdata/python"
 with open(file) as f:
     for piece in readInChunks(f):
         count += 1
