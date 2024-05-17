@@ -108,7 +108,8 @@ def randomVar(length=8):
     letters = string.ascii_lowercase
     resultStr = ''.join(random.choice(letters) for i in range(length))
     return resultStr
-def place(chunk, toLocation, count=0):
+def place(chunk, toLocation, size, count=0):
+    
     if not os.path.exists(toLocation):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
         
@@ -119,8 +120,8 @@ def place(chunk, toLocation, count=0):
     j = open(fileName, "x")   
     j.write(chunk)
     j.close()
-    print(chunk[0:20])
-    print("placed")        
+    #print(chunk[0:20])
+    print(f"placed {count}")        
 
 def readInChunks(file, chunk_size=23000):
     while True:
@@ -140,6 +141,6 @@ def mainloop():
     with open(file) as f:
         for piece in readInChunks(f):
             count += 1
-            place(piece, toLocation, count)
+            place(piece, toLocation, size, count)
 
 mainloop()
