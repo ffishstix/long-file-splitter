@@ -17,6 +17,7 @@ def GetInputInt(prompt, min=1, max=2):
             break
         else:
             print(f"Invalid value - please enter a integer between {min} and {max}")
+    return userInput        
 
 def getInfo():
 
@@ -55,7 +56,7 @@ def getInfo():
 
     while not isValid:
         count += 1
-        final = input("Enter full name, including file location, if easier leave blank> ")
+        final = input("\nEnter full name, including file location, if easier leave blank> ")
         
         if not final or final.strip() == "":
             y = input("Enter file location> ")
@@ -87,26 +88,28 @@ def getInfo():
     
     while not isValid:
 
-        toLocation = input("""file location to deposit broken down file
-                           must look like:
-                           [drive]:/[folder]/[folder]
-                           > """)
+        toLocation = input("""\n\nfile location to deposit broken down file
+must look like:
+[drive]:/[folder]/[folder]
+> """)
         if  toLocation or toLocation.strip() != "":
             if os.path.isdir(toLocation):
                 isValid = True
             else:
-                x = GetInputInt("""you have two options:
+                x = GetInputInt("""\nyou have two options:
                           1, i create the folder for you
                           2, you got it wrong and would like to input it again """)
                 if x == 1:
+                    print("here")
                     Path(toLocation).mkdir(parents=True, exist_ok=True)
-                    isvalid = True
+                    isValid = True
         else:
-            print("press enter to continue with default")
+            print("\npress enter to continue with default")
             print("or press any key and then press enter to reenter")
             x = input("> ")
             if not toLocation or toLocation.strip() == "":
                 toLocation = "C:/appdata/python"
+                isValid = True
 
 
         
