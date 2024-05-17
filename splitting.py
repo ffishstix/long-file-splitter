@@ -75,10 +75,8 @@ def randomVar(length=8):
     return resultStr
 def place(chunk, toLocation, count=0):
     if not os.path.exists(toLocation):
-        os.mkdir(toLocation)
-        print("programdata file does not exist, must be on windows and C:")
-        time.sleep(0.5)
-        exit(420)
+        Path(toLocation).mkdir(parents=True, exist_ok=True)
+        
     print("test")    
     fileName = os.path.join(toLocation, "pi-part" + str(count) + randomVar(8))
     while os.path.isfile(fileName):
