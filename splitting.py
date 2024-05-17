@@ -98,7 +98,7 @@ def getInfo():
             print("or press any key and then press enter to reenter")
             x = input("> ")
             if not toLocation or toLocation.strip() == "":
-                toLocation = "C:/appdata/python"
+                toLocation = "C:/ProgramData/python"
                 isValid = True
 
     arr.append(toLocation)
