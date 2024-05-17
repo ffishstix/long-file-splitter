@@ -6,7 +6,7 @@ from pathlib import Path
 
 def GetInputInt(prompt, min=1, max=2):
     while True:
-        userInput = input(prompt + ': ')
+        userInput = input(prompt)
         try:
             userInput = int(userInput)
         except ValueError:
@@ -75,11 +75,7 @@ def getInfo():
             if os.path.isfile(final):
                 isValid = True
         if count >= 3:
-            print("""\nYou may need to remember these crucial things:
-            1. When inputting location remember to remove apostrophes.
-            2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.
-            3. When inputting name remember to include the .txt extension.
-               If you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n""")
+            print("\nYou may need to remember these crucial things:\n1. When inputting location remember to remove apostrophes.\n2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.\n3. When inputting name remember to include the .txt extension.\nIf you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n")
 
     size = os.path.getsize(final)
     arr = [final, size]  # Making it so that returning it is easier.
@@ -88,19 +84,13 @@ def getInfo():
     
     while not isValid:
 
-        toLocation = input("""\n\nfile location to deposit broken down file
-must look like:
-[drive]:/[folder]/[folder]
-> """)
+        toLocation = input("\n\nfile location to deposit broken down file\nmust look like:\n[drive]:/[folder]/[folder]\n> ")
         if  toLocation or toLocation.strip() != "":
             if os.path.isdir(toLocation):
                 isValid = True
             else:
-                x = GetInputInt("""\nyou have two options:
-                          1, i create the folder for you
-                          2, you got it wrong and would like to input it again """)
+                x = GetInputInt("\nyou have two options:\n1, i create the folder for you\n2, you got it wrong and would like to input it again\n> ")
                 if x == 1:
-                    print("here")
                     Path(toLocation).mkdir(parents=True, exist_ok=True)
                     isValid = True
         else:
@@ -111,7 +101,7 @@ must look like:
                 toLocation = "C:/appdata/python"
                 isValid = True
 
-
+    arr.append(toLocation)
         
     
     
@@ -144,8 +134,8 @@ def readInChunks(file, chunk_size=23000):
 temp = getInfo()
 file = temp[0]
 size = temp[1]
+toLocation = temp[2]
 count = 0
-toLocation = "C:/appdata/python"
 with open(file) as f:
     for piece in readInChunks(f):
         count += 1
