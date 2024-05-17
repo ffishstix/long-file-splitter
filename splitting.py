@@ -60,7 +60,6 @@ def getInfo():
         else:
             if os.path.isfile(final):
                 isValid = True
-
         if count >= 3:
             print("""\nYou may need to remember these crucial things:
             1. When inputting location remember to remove apostrophes.
@@ -96,7 +95,7 @@ def place(chunk, toLocation="C:/temp/python", count=0):
 
 def readInChunks(file="C:/Users/finla/Downloads/y-cruncher v0.8.4.9538a/y-cruncher v0.8.4.9538a/Pi - Dec - Chudnovsky.txt", chunk_size=23000):
     """Lazy function (generator) to read a file piece by piece.
-    Default chunk size: 1k."""
+    Default chunk size: 23k."""
     while True:
         data = file.read(chunk_size)
         if not data:
