@@ -108,8 +108,13 @@ def randomVar(length=8):
     letters = string.ascii_lowercase
     resultStr = ''.join(random.choice(letters) for i in range(length))
     return resultStr
-def place(chunk, toLocation, size, count=0):
-    
+def place(chunk, toLocation, size, chunkSize, count=0):
+    placements = int(size)//int(chunkSize)
+    print(f"placements {placements} and count {count}")
+    if placements == 1 and count==1:
+        closeImediately = True
+    else:
+        closeImediately = False    
     if not os.path.exists(toLocation):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
         
@@ -119,17 +124,19 @@ def place(chunk, toLocation, size, count=0):
         fileName = os.path.join(toLocation, "pi-part" + str(count) + randomVar(8))
     j = open(fileName, "x")   
     j.write(chunk)
-    j.close()
+    
+    if closeImediately or placements == count:
+        print(f"closed {count}")
+        j.close()
     #print(chunk[0:20])
     print(f"placed {count}")        
 
-def readInChunks(file, chunk_size=23000):
+def readInChunks(file, chunkSize=23000):
     while True:
-        data = file.read(chunk_size)
+        data = file.read(chunkSize)
         if not data:
             break
         yield data
-
 
     
 def mainloop():
@@ -138,9 +145,10 @@ def mainloop():
     size = temp[1]
     toLocation = temp[2]
     count = 0
+    chunkSize = 23000
     with open(file) as f:
-        for piece in readInChunks(f):
+        for piece in readInChunks(f, chunkSize):
             count += 1
-            place(piece, toLocation, size, count)
+            place(piece, toLocation, size, chunkSize, count)
 
 mainloop()
