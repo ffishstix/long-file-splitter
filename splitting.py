@@ -20,36 +20,6 @@ def GetInputInt(prompt, min=1, max=2):
     return userInput        
 
 def getInfo():
-
-    """while not isValid:
-        count = count + 1
-        final = input("enter full name, including file location, if easier leave blank> ")
-        if final == None or final == " " or final == "":
-            
-            y = input("enter file location> ")
-            x = input("enter file name")
-            if os.path.isfile(y):
-                final = y
-                isValid = True
-            elif os.path.isfile(x):
-                final = x
-                isValid = True
-            elif os.path.isfile(str(y + x)):
-                final = y + x
-                isValid = True
-            if count >= 3:
-                print(you may need to remember these crucial things
-                    1, when inputing location remember to remove appostrophies
-                    2, when inputing location remember to include [drive letter]:/[folder]/[folder]/ 
-                    
-                    3, when inputting name remember to include the .txt
-                    if you do not include the .txt and it is another extension then it will only look for .txt and it will not work)   
-        else:
-            if os.path.isfile(final):
-                isValid = True        
-    size = os.path.getsize(final)
-    arr = [final, size] # making it so that returning it is easier.
-    return arr"""
     count = 0
     final = None
     isValid = False
