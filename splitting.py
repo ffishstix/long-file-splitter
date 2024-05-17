@@ -3,6 +3,21 @@ import time
 import string
 import random
 from pathlib import Path
+
+def GetInputInt(prompt, min=1, max=2):
+    while True:
+        userInput = input(prompt + ': ')
+        try:
+            userInput = int(userInput)
+        except ValueError:
+            print('Invalid value - Please enter a whole number')
+            continue
+
+        if min <= userInput <= max:
+            break
+        else:
+            print(f"Invalid value - please enter a integer between {min} and {max}")
+
 def getInfo():
 
     """while not isValid:
@@ -67,6 +82,26 @@ def getInfo():
 
     size = os.path.getsize(final)
     arr = [final, size]  # Making it so that returning it is easier.
+
+    isValid = False
+    
+    while not isValid:
+
+        toLocation = input("""file location to deposit broken down file
+                           must look like:
+                           [drive]:/[folder]/[folder]
+                           > """)
+        if  toLocation or toLocation.strip() != "":
+            if os.path.isdir(toLocation):
+                isValid = True
+            else:
+                x = GetInputInt("""you have two options:
+                          1, i create the folder for you
+                          2, you got it wrong and would like to input it again """)
+                if x == 1:
+                    print()
+        
+    
     
     return arr
 def randomVar(length=8):
