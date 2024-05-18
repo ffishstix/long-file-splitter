@@ -41,7 +41,8 @@ def getFromFile():
     isValid = False
     while not isValid:
         count += 1
-        final = input("\nEnter full name, including file location, if easier leave blank> ")
+        print("please input the file that you would like to split")
+        final = input("\nEnter full file name, including file location, if easier leave blank (will get more options)> ")
         
         if not final or final.strip() == "":
             y = input("Enter file location> ")
@@ -93,8 +94,8 @@ def getToTotal():
     while not isValid:
         print("\nthe file wil look something like [prefix] 1,2,3... qaswdtres [suffix]")
         print("\nthis is because it allows more files to be generated without running into the same file name,\n the qaswdtres are random letters\n that are generated each loop\n leave blank for defaults:\nrandom ammount: 8\nsuffix: file\nprefix: .txt")
-        randomAmmount = getInputInt("enter the length of random characters> ")
-        if not randomAmmount or randomAmmount.strip() == "":
+        randomAmmount = getInputInt("enter the length of random characters 2-16> ", 2, 16)
+        if not randomAmmount or str(randomAmmount).strip() == "":
             randomAmmount = 8    
         print("\nspecify file prefix")
         prefix = input("> ")
@@ -112,12 +113,12 @@ def getToTotal():
 def getSplitFileSize(fromFile, fromFileSize):
     isValid = False
     while not isValid:
-        x = getInputInt("\nenter size of smaller files> ", 1, fromFileSize-1)
+        x = getInputInt("\nenter size of smaller files in bytes> ", 1, fromFileSize-1)
         if x < fromFileSize:
             amountOfFiles = (fromFileSize // x) + 1
-            print(f"there will be {amountOfFiles} files, is this ok? ")
+            print(f"there will be {amountOfFiles} files")
             time.sleep(0.2)
-            y = input("enter to continue, anything else to reenter> ")
+            y = input("enter to continue> ")
             if  not y or y.strip() == "":
                 isValid = True
 
@@ -129,12 +130,24 @@ def getSplitFileSize(fromFile, fromFileSize):
     return x        
 
 def getInfo():
-    fromFile = getFromFile()
-    fileSize = getSizeFile(fromFile)
-    toLocation = getToTotal()
-    chunkSize = getSplitFileSize(fromFile, fileSize)
-    arr = [fromFile, fileSize, toLocation, chunkSize]
-    
+    while True: # should allow for more options
+
+        fromFile = getFromFile()
+        fileSize = getSizeFile(fromFile)
+        toLocation = getToTotal()
+        chunkSize = getSplitFileSize(fromFile, fileSize)
+        arr = [fromFile, fileSize, toLocation, chunkSize]
+        print(f"\n\n\n the file location of your large file: {fromFile}")
+        time.sleep(0.4)
+        print(f"\n\n the file location of your smaller file: {toLocation[1]}")
+        time.sleep(0.4)
+        print(f"\n\n the size of each smaller files: {chunkSize} bytes")
+        time.sleep(0.4)
+        print("\n if you are alright with this press enter")
+        x = input("otherwise press anykey and then enter> ")
+        if not x or x.strip() == "":
+            break
+
     return arr
 
 def randomVar(length=8):
