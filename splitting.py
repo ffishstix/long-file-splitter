@@ -2,8 +2,10 @@ import os
 import time
 import string
 import random
+import psutil
 from pathlib import Path
-
+def getMemoryAvaiable():
+    return psutil.virtual_memory().available
 def stringInFile(strSearch, filePath="fileExtensions.txt"):
     try:
         with open(filePath, 'r') as file:
@@ -24,8 +26,12 @@ def getInputInt(prompt, min=1, max=2):
         try:
             userInput = int(userInput)
         except ValueError:
-            print('Invalid value - Please enter a whole number')
-            continue
+            if not userInput or str(userInput).strip() == "":
+                userInput = min
+                break
+            else:
+                print('Invalid value - Please enter a whole number')
+                continue
 
         if min <= userInput <= max:
             break
@@ -94,13 +100,17 @@ def getToTotal():
     while not isValid:
         print("\nthe file wil look something like [prefix] 1,2,3... qaswdtres [suffix]")
         print("\nthis is because it allows more files to be generated without running into the same file name,\n the qaswdtres are random letters\n that are generated each loop\n leave blank for defaults:\nrandom ammount: 8\nsuffix: file\nprefix: .txt")
-        randomAmmount = getInputInt("enter the length of random characters 2-16> ", 2, 16)
+        randomAmmount = getInputInt("\nenter the length of random characters 2-16> ", 2, 16)
         if not randomAmmount or str(randomAmmount).strip() == "":
             randomAmmount = 8    
         print("\nspecify file prefix")
         prefix = input("> ")
-        print("\n specify file suffix")
+        if not prefix or prefix.strip() == "":
+            print("default selected (file)")
+        print("\n specify file suffix")        
         suffix = input("> ")
+        if not suffix or suffix.strip() == "":
+            print("default selected (.txt)")
         if stringInFile(suffix):
             toLocation = [prefix, toLocation, suffix]
             isValid = True
@@ -110,11 +120,14 @@ def getToTotal():
 
     return toLocation        
 
-def getSplitFileSize(fromFile, fromFileSize):
+def getSplitFileSize(fromFileSize):
     isValid = False
     while not isValid:
         x = getInputInt("\nenter size of smaller files in bytes> ", 1, fromFileSize-1)
-        if x < fromFileSize:
+        memory = getMemoryAvaiable()
+        comp1 = x < fromFileSize
+        comp2 = x < memory
+        if comp1 and comp2:
             amountOfFiles = (fromFileSize // x) + 1
             print(f"there will be {amountOfFiles} files")
             time.sleep(0.2)
@@ -124,19 +137,27 @@ def getSplitFileSize(fromFile, fromFileSize):
 
             
         else:
-            print(f"smaller file size cannot exceed original file size: {fromFileSize}")    
-            print(f"you selected {x}, that is {x - fromFileSize} more than the original size")
+            if not comp1:
+
+                print(f"smaller file size cannot exceed original file size: {fromFileSize}")    
+                print(f"you selected {x}, that is {x - fromFileSize} more than the original size")
+            if not comp2:
+                print(f"make sure you have adequate memory: {memory/1000000000}GB's")
 
     return x        
 
+def deleteOldFileQuestion(file): 
+    return getInputInt(f"would you like to delete {file} after the split\n1, no\n 2, yes", 1, 2) == 1
+    
 def getInfo():
     while True: # should allow for more options
 
         fromFile = getFromFile()
         fileSize = getSizeFile(fromFile)
         toLocation = getToTotal()
-        chunkSize = getSplitFileSize(fromFile, fileSize)
-        arr = [fromFile, fileSize, toLocation, chunkSize]
+        chunkSize = getSplitFileSize(fileSize)
+        delete = deleteOldFileQuestion(fromFile)
+        arr = [fromFile, fileSize, toLocation, chunkSize, delete]
         print(f"\n\n\n the file location of your large file: {fromFile}")
         time.sleep(0.4)
         print(f"\n\n the file location of your smaller file: {toLocation[1]}")
@@ -151,9 +172,7 @@ def getInfo():
     return arr
 
 def randomVar(length=8):
-    letters = string.ascii_lowercase
-    resultStr = ''.join(random.choice(letters) for i in range(length))
-    return resultStr
+    return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
 def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):
     placements = int(size)//int(chunkSize)
     print(f"placements {placements} and count {count}")
@@ -183,7 +202,12 @@ def readInChunks(file, chunkSize=32767):
         if not data:
             break
         yield data
-
+    
+def deleteOldFile(file):
+    if os.path.exists(file):
+        os.remove(file)
+    else:
+        print(f"could not find {file}\n possible reasons for this are:\n 1, the file is already deleted\n2, the file is corrupt")        
     
 def mainloop():
     temp = getInfo()
@@ -193,13 +217,16 @@ def mainloop():
     prefix = arrtoLocation[0]
     suffix = arrtoLocation[2]
     toLocation = arrtoLocation[1]
-    
     chunkSize = temp[3]
+    delete = temp[4]
     count = 0
     with open(file) as f:
         for piece in readInChunks(f, chunkSize):
             count += 1
             place(piece, toLocation, prefix, suffix, size, chunkSize, count)
 
+    if delete:
+        deleteOldFile(file)        
+            
 mainloop()
 
