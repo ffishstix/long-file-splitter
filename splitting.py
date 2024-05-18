@@ -4,23 +4,21 @@ import string
 import random
 import psutil
 from pathlib import Path
-
 def getMemoryAvaiable():
     return psutil.virtual_memory().available
-
-def getSizeFile(file):
-    return os.path.getsize(file)
-
-def deleteOldFileQuestion(file): 
-    return getInputInt(f"would you like to delete {file} after the split\n1, no\n 2, yes", 1, 2) == 1
-def deleteOldFile(file):
-    if os.path.exists(file):
-        os.remove(file)
-    else:
-        print(f"could not find {file}\n possible reasons for this are:\n 1, the file is already deleted\n2, the file is corrupt")
-
-def randomVar(length=8):
-    return ''.join(random.choice(string.ascii_lowercase) for i in range(length))        
+def stringInFile(strSearch, filePath="fileExtensions.txt"):
+    try:
+        with open(filePath, 'r') as file:
+            for line in file:
+                if strSearch in line:
+                    return True
+        return False
+    except FileNotFoundError:
+        print(f"File {filePath} not found.")
+        return False
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False
 
 def getInputInt(prompt, min=1, max=2):
     while True:
@@ -41,20 +39,8 @@ def getInputInt(prompt, min=1, max=2):
             print(f"Invalid value - please enter a integer between {min} and {max}")
     return userInput        
 
-def stringInFile(strSearch, filePath="fileExtensions.txt"):
-    try:
-        with open(filePath, 'r') as file:
-            for line in file:
-                if strSearch in line:
-                    return True
-        return False
-    except FileNotFoundError:
-        print(f"File {filePath} not found.")
-        return False
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return False
-
+def getSizeFile(file):
+    return os.path.getsize(file)
 def getFromFile():
     count = 0
     final = None
@@ -159,6 +145,9 @@ def getSplitFileSize(fromFileSize):
                 print(f"make sure you have adequate memory: {memory/1000000000}GB's")
 
     return x        
+
+def deleteOldFileQuestion(file): 
+    return getInputInt(f"would you like to delete {file} after the split\n1, no\n 2, yes", 1, 2) == 1
     
 def getInfo():
     while True: # should allow for more options
@@ -182,6 +171,8 @@ def getInfo():
 
     return arr
 
+def randomVar(length=8):
+    return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
 def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):
     placements = int(size)//int(chunkSize)
     print(f"placements {placements} and count {count}")
@@ -211,6 +202,12 @@ def readInChunks(file, chunkSize=32767):
         if not data:
             break
         yield data
+    
+def deleteOldFile(file):
+    if os.path.exists(file):
+        os.remove(file)
+    else:
+        print(f"could not find {file}\n possible reasons for this are:\n 1, the file is already deleted\n2, the file is corrupt")        
     
 def mainloop():
     temp = getInfo()
