@@ -89,9 +89,9 @@ def place(chunk, toLocation, size, chunkSize, count=0):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
         
     print("test")    
-    fileName = os.path.join(toLocation, "pi-part" + str(count) + randomVar(8))
+    fileName = os.path.join(toLocation, "pi-part" + str(count) + randomVar(8) + ".txt")
     while os.path.isfile(fileName):
-        fileName = os.path.join(toLocation, "pi-part" + str(count) + randomVar(8))
+        fileName = os.path.join(toLocation, "pi-part" + str(count) + randomVar(8) + ".txt")
     j = open(fileName, "x")   
     j.write(chunk)
     
