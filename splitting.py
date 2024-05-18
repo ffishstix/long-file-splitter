@@ -4,7 +4,7 @@ import string
 import random
 from pathlib import Path
 
-def GetInputInt(prompt, min=1, max=2):
+def getInputInt(prompt, min=1, max=2):
     while True:
         userInput = input(prompt)
         try:
@@ -18,6 +18,7 @@ def GetInputInt(prompt, min=1, max=2):
         else:
             print(f"Invalid value - please enter a integer between {min} and {max}")
     return userInput        
+
 def getSizeFile(file):
     return os.path.getsize(file)
 def getFromFile():
@@ -71,40 +72,34 @@ def getToFile():
                 isValid = True
     return toLocation                     
 
+def getSplitFileSize(fromFile, fromFileSize):
+    isValid = False
+    while not isValid:
+        x = getInputInt("\nenter size of smaller files> ", 1, fromFileSize-1)
+        if x < fromFileSize:
+            amountOfFiles = (fromFileSize // x) + 1
+            print(f"there will be {amountOfFiles} files, is this ok? ")
+            time.sleep(0.2)
+            y = input("enter to continue, anything else to reenter> ")
+            if  not y or y.strip() == "":
+                isValid = True
+
+            print(f"with {x} as the smaller file size there will be ")
+        else:
+            print(f"smaller file size cannot exceed original file size: {fromFileSize}")    
+            print(f"you selected {x}, that is {x - fromFileSize} more than the original size")
+
+    return x        
+            
+
+
 def getInfo():
     fromFile = getFromFile()
     fileSize = getSizeFile(fromFile)
-    arr = [fromFile, fileSize]  # Making it so that returning it is easier.
-
-    isValid = False
+    toLocation = getToFile()
+    chunkSize = getSplitFileSize(fromFile, fileSize)
+    arr = [fromFile, fileSize, toLocation, chunkSize]
     
-    while not isValid:
-
-        toLocation = input("\n\nfile location to deposit broken down file\nmust look like:\n[drive]:/[folder]/[folder]\n> ")
-        if  toLocation or toLocation.strip() != "":
-            if os.path.isdir(toLocation):
-                isValid = True
-            else:
-                x = GetInputInt("\nyou have two options:\n1, i create the folder for you\n2, you got it wrong and would like to input it again\n> ")
-                if x == 1:
-                    Path(toLocation).mkdir(parents=True, exist_ok=True)
-                    isValid = True
-        else:
-            print(f"\npress enter to continue with default ()")
-            print("or press any key and then press enter to reenter")
-            x = input("> ")
-            if not toLocation or toLocation.strip() == "":
-                toLocation = "C:/ProgramData/python"
-                isValid = True
-
-
-    isValid = False
-    
-    while not isValid:
-        print()
-        
-
-    arr.append(toLocation)
     return arr
 
 def randomVar(length=8):
@@ -122,9 +117,9 @@ def place(chunk, toLocation, size, chunkSize, count=0):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
         
     print("test")    
-    fileName = os.path.join(toLocation, "pi-part" + str(count) + randomVar(8) + ".txt")
-    while os.path.isfile(fileName):
-        fileName = os.path.join(toLocation, "pi-part" + str(count) + randomVar(8) + ".txt")
+    fileName = ""
+    while not os.path.isfile(fileName):
+        fileName = os.path.join(toLocation, "file" + str(count) + randomVar(8) + ".txt")
     j = open(fileName, "x")   
     j.write(chunk)
     
@@ -134,7 +129,7 @@ def place(chunk, toLocation, size, chunkSize, count=0):
     #print(chunk[0:20])
     print(f"placed {count}")        
 
-def readInChunks(file, chunkSize=23000):
+def readInChunks(file, chunkSize=32767):
     while True:
         data = file.read(chunkSize)
         if not data:
