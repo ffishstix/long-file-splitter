@@ -45,7 +45,7 @@ def getFromFile():
         else:
             if os.path.isfile(final):
                 isValid = True
-        if count >= 3:
+        if count >= 3 and not isValid:
             print("\nYou may need to remember these crucial things:\n1. When inputting location remember to remove apostrophes.\n2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.\n3. When inputting name remember to include the .txt extension.\nIf you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n")
     return final       
 
@@ -117,8 +117,8 @@ def place(chunk, toLocation, size, chunkSize, count=0):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
         
     print("test")    
-    fileName = ""
-    while not os.path.isfile(fileName):
+    fileName = os.path.join(toLocation, "file" + str(count) + randomVar(8) + ".txt")
+    while os.path.isfile(fileName):
         fileName = os.path.join(toLocation, "file" + str(count) + randomVar(8) + ".txt")
     j = open(fileName, "x")   
     j.write(chunk)
