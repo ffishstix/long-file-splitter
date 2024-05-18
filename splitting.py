@@ -26,13 +26,14 @@ def getInputInt(prompt, min=1, max=2):
         try:
             userInput = int(userInput)
         except ValueError:
-            print('Invalid value - Please enter a whole number')
-            continue
+            if not userInput or str(userInput).strip() == "":
+                userInput = min
+                break
+            else:
+                print('Invalid value - Please enter a whole number')
+                continue
 
         if min <= userInput <= max:
-            break
-        elif not userInput or str(userInput).strip() == "":
-            userInput = min
             break
         else:
             print(f"Invalid value - please enter a integer between {min} and {max}")
@@ -99,7 +100,7 @@ def getToTotal():
     while not isValid:
         print("\nthe file wil look something like [prefix] 1,2,3... qaswdtres [suffix]")
         print("\nthis is because it allows more files to be generated without running into the same file name,\n the qaswdtres are random letters\n that are generated each loop\n leave blank for defaults:\nrandom ammount: 8\nsuffix: file\nprefix: .txt")
-        randomAmmount = getInputInt("enter the length of random characters 2-16> ", 2, 16)
+        randomAmmount = getInputInt("\nenter the length of random characters 2-16> ", 2, 16)
         if not randomAmmount or str(randomAmmount).strip() == "":
             randomAmmount = 8    
         print("\nspecify file prefix")
