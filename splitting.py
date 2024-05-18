@@ -20,7 +20,7 @@ def stringInFile(strSearch, filePath="fileExtensions.txt"):
         print(f"An error occurred: {e}")
         return False
 
-def getInputInt(prompt, min=1, max=2, default=""):
+def getInputInt(prompt, min=1, max=2, default=min):
     while True:
         userInput = input(prompt)
         try:
@@ -53,6 +53,7 @@ def getFromFile():
         if not final or final.strip() == "":
             y = input("Enter file location> ")
             x = input("Enter file name> ")
+            print(f"here {y + x}")
 
             if os.path.isdir(y) and os.path.isfile(os.path.join(y, x)):
                 final = os.path.join(y, x)
@@ -64,8 +65,10 @@ def getFromFile():
                 final = os.path.join(y, x)
                 isValid = True
         else:
+            print(final)
             if os.path.isfile(final):
                 isValid = True
+                break
         if count >= 3 and not isValid:
             print("\nYou may need to remember these crucial things:\n1. When inputting location remember to remove apostrophes.\n2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.\n3. When inputting name remember to include the .txt extension.\nIf you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n")
     return final       
@@ -80,7 +83,7 @@ def getToFolder():
             if os.path.isdir(toLocation):
                 isValid = True
             else:
-                x = getInputInt("\nyou have two options:\n1, i create the folder for you\n2, you got it wrong and would like to input it again\n> ")
+                x = getInputInt("\nyou have two options:\n1, i create the folder for you\n2, you got it wrong and would like to input it again\n> ", 1, 2, 1)
                 if x == 1:
                     Path(toLocation).mkdir(parents=True, exist_ok=True)
                     isValid = True
@@ -100,7 +103,7 @@ def getToTotal():
     while not isValid:
         print("\nthe file wil look something like [prefix] 1,2,3... qaswdtres [suffix]")
         print("\nthis is because it allows more files to be generated without running into the same file name,\n the qaswdtres are random letters\n that are generated each loop\n leave blank for defaults:\nrandom ammount: 8\nsuffix: file\nprefix: .txt")
-        randomAmmount = getInputInt("\nenter the length of random characters 2-16> ", 2, 16)
+        randomAmmount = getInputInt("\nenter the length of random characters 2-16> ", 2, 16, 8)
         if not randomAmmount or str(randomAmmount).strip() == "":
             randomAmmount = 8    
         print("\nspecify file prefix")
@@ -123,13 +126,15 @@ def getToTotal():
 def getSplitFileSize(fromFileSize):
     isValid = False
     while not isValid:
-        x = getInputInt("\nenter size of smaller files in bytes> ", 1, fromFileSize-1)
+        x = getInputInt("\nenter size of smaller files in bytes> ", 1, fromFileSize-1, 50000)
         memory = getMemoryAvaiable()
         comp1 = x < fromFileSize
         comp2 = x < memory
         if comp1 and comp2:
             amountOfFiles = (fromFileSize // x) + 1
-            print(f"there will be {amountOfFiles} files")
+            last = fromFileSize% x
+            print(f"there will be {amountOfFiles} files, at {x}bytes")
+            print(f"apart from the last file which will be {last}bytes")
             time.sleep(0.2)
             y = input("enter to continue> ")
             if  not y or y.strip() == "":
@@ -147,7 +152,7 @@ def getSplitFileSize(fromFileSize):
     return x        
 
 def deleteOldFileQuestion(file): 
-    return getInputInt(f"would you like to delete {file} after the split\n1, no\n 2, yes", 1, 2) == 1
+    return getInputInt(f"would you like to delete {file} after the split (default=no)\n1, no\n2, yes", 1, 2,1) == 1
     
 def getInfo():
     while True: # should allow for more options
@@ -207,7 +212,7 @@ def deleteOldFile(file):
     if os.path.exists(file):
         os.remove(file)
     else:
-        print(f"could not find {file}\n possible reasons for this are:\n 1, the file is already deleted\n2, the file is corrupt")        
+        print(f"could not find {file}\n possible reasons for this are:\n 1, the file is already deleted \n 2, the file is corrupt\n> ")        
     
 def mainloop():
     temp = getInfo()
