@@ -28,6 +28,9 @@ def getInputInt(prompt, min=1, max=2, default=min):
         except ValueError:
             if not userInput or str(userInput).strip() == "":
                 userInput = default
+                print(default == 1)
+                print(default)
+                print("here")
                 break
             else:
                 print('Invalid value - Please enter a whole number')
@@ -53,7 +56,6 @@ def getFromFile():
         if not final or final.strip() == "":
             y = input("Enter file location> ")
             x = input("Enter file name> ")
-            print(f"here {y + x}")
 
             if os.path.isdir(y) and os.path.isfile(os.path.join(y, x)):
                 final = os.path.join(y, x)
@@ -68,7 +70,6 @@ def getFromFile():
             print(final)
             if os.path.isfile(final):
                 isValid = True
-                break
         if count >= 3 and not isValid:
             print("\nYou may need to remember these crucial things:\n1. When inputting location remember to remove apostrophes.\n2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.\n3. When inputting name remember to include the .txt extension.\nIf you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n")
     return final       
@@ -152,7 +153,7 @@ def getSplitFileSize(fromFileSize):
     return x        
 
 def deleteOldFileQuestion(file): 
-    return getInputInt(f"would you like to delete {file} after the split (default=no)\n1, no\n2, yes", 1, 2,1) == 1
+    return getInputInt(f"would you like to delete {file} after the split (default=no)\n1, no\n2, yes", 1, 2,1) == 2
     
 def getInfo():
     while True: # should allow for more options
@@ -180,15 +181,13 @@ def randomVar(length=8):
     return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
 def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):
     placements = int(size)//int(chunkSize)
-    print(f"placements {placements} and count {count}")
     if placements == 1 and count==1:
         closeImediately = True
     else:
         closeImediately = False    
     if not os.path.exists(toLocation):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
-        
-    print("test")    
+    
     fileName = os.path.join(toLocation, f"{prefix}{str(count)}{randomVar(8)}{suffix}")
     while os.path.isfile(fileName):
         fileName = os.path.join(toLocation, f"{prefix}{str(count)}{randomVar(8)}{suffix}")
@@ -196,10 +195,8 @@ def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):
     j.write(chunk)
     
     if closeImediately or placements == count:
-        print(f"closed {count}")
-        j.close()
-    #print(chunk[0:20])
-    print(f"placed {count}")        
+        print("file closed")
+        j.close()      
 
 def readInChunks(file, chunkSize=32767):
     while True:
@@ -211,6 +208,7 @@ def readInChunks(file, chunkSize=32767):
 def deleteOldFile(file):
     if os.path.exists(file):
         os.remove(file)
+        print(f"{file} removed")
     else:
         print(f"could not find {file}\n possible reasons for this are:\n 1, the file is already deleted \n 2, the file is corrupt\n> ")        
     
@@ -234,4 +232,4 @@ def mainloop():
         deleteOldFile(file)        
             
 mainloop()
-
+x = input("enter to exit program> ")
