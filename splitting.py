@@ -31,6 +31,9 @@ def getInputInt(prompt, min=1, max=2):
 
         if min <= userInput <= max:
             break
+        elif not userInput or str(userInput).strip() == "":
+            userInput = min
+            break
         else:
             print(f"Invalid value - please enter a integer between {min} and {max}")
     return userInput        
