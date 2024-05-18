@@ -46,7 +46,31 @@ def getFromFile():
                 isValid = True
         if count >= 3:
             print("\nYou may need to remember these crucial things:\n1. When inputting location remember to remove apostrophes.\n2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.\n3. When inputting name remember to include the .txt extension.\nIf you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n")
-    return final        
+    return final       
+
+def getToFile():
+    isValid = False
+    toLocation = None
+    while not isValid:
+
+        toLocation = input("\n\nfile location to deposit broken down file\nmust look like:\n[drive]:/[folder]/[folder]\n> ")
+        if  toLocation or toLocation.strip() != "":
+            if os.path.isdir(toLocation):
+                isValid = True
+            else:
+                x = GetInputInt("\nyou have two options:\n1, i create the folder for you\n2, you got it wrong and would like to input it again\n> ")
+                if x == 1:
+                    Path(toLocation).mkdir(parents=True, exist_ok=True)
+                    isValid = True
+        else:
+            print(f"\npress enter to continue with default (C:/ProgramData/python)")
+            print("or press any key and then press enter to reenter")
+            x = input("> ")
+            if not toLocation or toLocation.strip() == "":
+                toLocation = "C:/ProgramData/python"
+                isValid = True
+    return toLocation                     
+
 def getInfo():
     fromFile = getFromFile()
     fileSize = getSizeFile(fromFile)
