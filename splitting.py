@@ -20,14 +20,22 @@ def stringInFile(strSearch, filePath="fileExtensions.txt"):
         print(f"An error occurred: {e}")
         return False
 
+<<<<<<< HEAD
 def getInputInt(prompt, min=1, max=2, default=""):
+=======
+def getInputInt(prompt, min=1, max=2):
+>>>>>>> parent of 27f7642 (rejiged the code to look a bit nicer and make more fluent sense with different functions)
     while True:
         userInput = input(prompt)
         try:
             userInput = int(userInput)
         except ValueError:
             if not userInput or str(userInput).strip() == "":
+<<<<<<< HEAD
                 userInput = default
+=======
+                userInput = min
+>>>>>>> parent of 27f7642 (rejiged the code to look a bit nicer and make more fluent sense with different functions)
                 break
             else:
                 print('Invalid value - Please enter a whole number')
@@ -37,7 +45,11 @@ def getInputInt(prompt, min=1, max=2, default=""):
             break
         else:
             print(f"Invalid value - please enter a integer between {min} and {max}")
+<<<<<<< HEAD
     return userInput      
+=======
+    return userInput        
+>>>>>>> parent of 27f7642 (rejiged the code to look a bit nicer and make more fluent sense with different functions)
 
 def getSizeFile(file):
     return os.path.getsize(file)
