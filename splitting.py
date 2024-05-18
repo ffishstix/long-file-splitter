@@ -2,8 +2,10 @@ import os
 import time
 import string
 import random
+import psutil
 from pathlib import Path
-
+def getMemoryAvaiable():
+    return psutil.virtual_memory().available
 def stringInFile(strSearch, filePath="fileExtensions.txt"):
     try:
         with open(filePath, 'r') as file:
@@ -110,11 +112,14 @@ def getToTotal():
 
     return toLocation        
 
-def getSplitFileSize(fromFile, fromFileSize):
+def getSplitFileSize(fromFileSize):
     isValid = False
     while not isValid:
         x = getInputInt("\nenter size of smaller files in bytes> ", 1, fromFileSize-1)
-        if x < fromFileSize:
+        memory = getMemoryAvaiable()
+        comp1 = x < fromFileSize
+        comp2 = x < memory
+        if comp1 and comp2:
             amountOfFiles = (fromFileSize // x) + 1
             print(f"there will be {amountOfFiles} files")
             time.sleep(0.2)
@@ -124,8 +129,12 @@ def getSplitFileSize(fromFile, fromFileSize):
 
             
         else:
-            print(f"smaller file size cannot exceed original file size: {fromFileSize}")    
-            print(f"you selected {x}, that is {x - fromFileSize} more than the original size")
+            if not comp1:
+
+                print(f"smaller file size cannot exceed original file size: {fromFileSize}")    
+                print(f"you selected {x}, that is {x - fromFileSize} more than the original size")
+            if not comp2:
+                print(f"make sure you have adequate memory: {memory/1000000000}GB's")
 
     return x        
 
@@ -135,7 +144,7 @@ def getInfo():
         fromFile = getFromFile()
         fileSize = getSizeFile(fromFile)
         toLocation = getToTotal()
-        chunkSize = getSplitFileSize(fromFile, fileSize)
+        chunkSize = getSplitFileSize(fileSize)
         arr = [fromFile, fileSize, toLocation, chunkSize]
         print(f"\n\n\n the file location of your large file: {fromFile}")
         time.sleep(0.4)
@@ -200,6 +209,6 @@ def mainloop():
         for piece in readInChunks(f, chunkSize):
             count += 1
             place(piece, toLocation, prefix, suffix, size, chunkSize, count)
-
+            
 mainloop()
 
