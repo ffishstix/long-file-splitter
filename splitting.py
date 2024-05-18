@@ -59,7 +59,7 @@ def getToFile():
             if os.path.isdir(toLocation):
                 isValid = True
             else:
-                x = GetInputInt("\nyou have two options:\n1, i create the folder for you\n2, you got it wrong and would like to input it again\n> ")
+                x = getInputInt("\nyou have two options:\n1, i create the folder for you\n2, you got it wrong and would like to input it again\n> ")
                 if x == 1:
                     Path(toLocation).mkdir(parents=True, exist_ok=True)
                     isValid = True
@@ -84,7 +84,7 @@ def getSplitFileSize(fromFile, fromFileSize):
             if  not y or y.strip() == "":
                 isValid = True
 
-            print(f"with {x} as the smaller file size there will be ")
+            
         else:
             print(f"smaller file size cannot exceed original file size: {fromFileSize}")    
             print(f"you selected {x}, that is {x - fromFileSize} more than the original size")
@@ -150,3 +150,4 @@ def mainloop():
             place(piece, toLocation, size, chunkSize, count)
 
 mainloop()
+
