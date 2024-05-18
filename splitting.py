@@ -18,12 +18,12 @@ def GetInputInt(prompt, min=1, max=2):
         else:
             print(f"Invalid value - please enter a integer between {min} and {max}")
     return userInput        
-
-def getInfo():
+def getSizeFile(file):
+    return os.path.getsize(file)
+def getFromFile():
     count = 0
     final = None
     isValid = False
-
     while not isValid:
         count += 1
         final = input("\nEnter full name, including file location, if easier leave blank> ")
@@ -46,9 +46,11 @@ def getInfo():
                 isValid = True
         if count >= 3:
             print("\nYou may need to remember these crucial things:\n1. When inputting location remember to remove apostrophes.\n2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.\n3. When inputting name remember to include the .txt extension.\nIf you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n")
-
-    size = os.path.getsize(final)
-    arr = [final, size]  # Making it so that returning it is easier.
+    return final        
+def getInfo():
+    fromFile = getFromFile()
+    fileSize = getSizeFile(fromFile)
+    arr = [fromFile, fileSize]  # Making it so that returning it is easier.
 
     isValid = False
     
@@ -64,12 +66,19 @@ def getInfo():
                     Path(toLocation).mkdir(parents=True, exist_ok=True)
                     isValid = True
         else:
-            print("\npress enter to continue with default")
+            print(f"\npress enter to continue with default ()")
             print("or press any key and then press enter to reenter")
             x = input("> ")
             if not toLocation or toLocation.strip() == "":
                 toLocation = "C:/ProgramData/python"
                 isValid = True
+
+
+    isValid = False
+    
+    while not isValid:
+        print()
+        
 
     arr.append(toLocation)
     return arr
@@ -114,8 +123,8 @@ def mainloop():
     file = temp[0]
     size = temp[1]
     toLocation = temp[2]
+    chunkSize = temp[3]
     count = 0
-    chunkSize = 23000
     with open(file) as f:
         for piece in readInChunks(f, chunkSize):
             count += 1
