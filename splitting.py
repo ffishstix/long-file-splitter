@@ -141,7 +141,9 @@ def getSplitFileSize(fromFileSize):
                 print(f"make sure you have adequate memory: {memory/1000000000}GB's")
 
     return x        
-
+def deleteOldFile(file):
+    print()
+    
 def getInfo():
     while True: # should allow for more options
 
@@ -149,6 +151,7 @@ def getInfo():
         fileSize = getSizeFile(fromFile)
         toLocation = getToTotal()
         chunkSize = getSplitFileSize(fileSize)
+        delete = deleteOldFile(fromFile)
         arr = [fromFile, fileSize, toLocation, chunkSize]
         print(f"\n\n\n the file location of your large file: {fromFile}")
         time.sleep(0.4)
