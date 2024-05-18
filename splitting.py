@@ -4,6 +4,20 @@ import string
 import random
 from pathlib import Path
 
+def stringInFile(strSearch, filePath="fileExtensions.txt"):
+    try:
+        with open(filePath, 'r') as file:
+            for line in file:
+                if strSearch in line:
+                    return True
+        return False
+    except FileNotFoundError:
+        print(f"File {filePath} not found.")
+        return False
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False
+
 def getInputInt(prompt, min=1, max=2):
     while True:
         userInput = input(prompt)
@@ -49,7 +63,7 @@ def getFromFile():
             print("\nYou may need to remember these crucial things:\n1. When inputting location remember to remove apostrophes.\n2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.\n3. When inputting name remember to include the .txt extension.\nIf you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n")
     return final       
 
-def getToFile():
+def getToFolder():
     isValid = False
     toLocation = None
     while not isValid:
@@ -70,7 +84,30 @@ def getToFile():
             if not toLocation or toLocation.strip() == "":
                 toLocation = "C:/ProgramData/python"
                 isValid = True
+                
     return toLocation                     
+
+def getToTotal():
+    toLocation = getToFolder()
+    isValid = False
+    while not isValid:
+        print("\nthe file wil look something like [prefix] 1,2,3... qaswdtres [suffix]")
+        print("\nthis is because it allows more files to be generated without running into the same file name,\n the qaswdtres are random letters\n that are generated each loop\n leave blank for defaults:\nrandom ammount: 8\nsuffix: file\nprefix: .txt")
+        randomAmmount = getInputInt("enter the length of random characters> ")
+        if not randomAmmount or randomAmmount.strip() == "":
+            randomAmmount = 8    
+        print("\nspecify file prefix")
+        prefix = input("> ")
+        print("\n specify file suffix")
+        suffix = input("> ")
+        if stringInFile(suffix):
+            toLocation = [prefix, toLocation, suffix]
+            isValid = True
+        else:
+            isValid = False
+
+
+    return toLocation        
 
 def getSplitFileSize(fromFile, fromFileSize):
     isValid = False
@@ -90,13 +127,11 @@ def getSplitFileSize(fromFile, fromFileSize):
             print(f"you selected {x}, that is {x - fromFileSize} more than the original size")
 
     return x        
-            
-
 
 def getInfo():
     fromFile = getFromFile()
     fileSize = getSizeFile(fromFile)
-    toLocation = getToFile()
+    toLocation = getToTotal()
     chunkSize = getSplitFileSize(fromFile, fileSize)
     arr = [fromFile, fileSize, toLocation, chunkSize]
     
@@ -106,7 +141,7 @@ def randomVar(length=8):
     letters = string.ascii_lowercase
     resultStr = ''.join(random.choice(letters) for i in range(length))
     return resultStr
-def place(chunk, toLocation, size, chunkSize, count=0):
+def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):
     placements = int(size)//int(chunkSize)
     print(f"placements {placements} and count {count}")
     if placements == 1 and count==1:
@@ -117,9 +152,9 @@ def place(chunk, toLocation, size, chunkSize, count=0):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
         
     print("test")    
-    fileName = os.path.join(toLocation, "file" + str(count) + randomVar(8) + ".txt")
+    fileName = os.path.join(toLocation, f"{prefix}{str(count)}{randomVar(8)}{suffix}")
     while os.path.isfile(fileName):
-        fileName = os.path.join(toLocation, "file" + str(count) + randomVar(8) + ".txt")
+        fileName = os.path.join(toLocation, f"{prefix}{str(count)}{randomVar(8)}{suffix}")
     j = open(fileName, "x")   
     j.write(chunk)
     
@@ -141,13 +176,17 @@ def mainloop():
     temp = getInfo()
     file = temp[0]
     size = temp[1]
-    toLocation = temp[2]
+    arrtoLocation = temp[2]
+    prefix = arrtoLocation[0]
+    suffix = arrtoLocation[2]
+    toLocation = arrtoLocation[1]
+    
     chunkSize = temp[3]
     count = 0
     with open(file) as f:
         for piece in readInChunks(f, chunkSize):
             count += 1
-            place(piece, toLocation, size, chunkSize, count)
+            place(piece, toLocation, prefix, suffix, size, chunkSize, count)
 
 mainloop()
 
