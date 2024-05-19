@@ -7,8 +7,7 @@ from pathlib import Path
 global bcolors
 from alive_progress import *
 
-def timeMs():
-    return time.time()
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -25,7 +24,6 @@ class bcolors:
         self.FAIL = ''
         self.ENDC = ''
 
-print(f"{bcolors.FAIL}hallo{bcolors.ENDC}")
 
 def getMemoryAvaiable():
     return psutil.virtual_memory().available
@@ -199,12 +197,6 @@ def getInfo():
 def randomVar(length=8):
     return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
 
-def compute(count, placements):
-
-    with alive_bar(count) as bar:  # your expected total
-        for item in items:        # the original loop
-            print(item)           # your actual processing here
-            bar()  
 def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):
     placements = int(size)//int(chunkSize)
     if count % 25 == 0:
