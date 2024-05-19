@@ -3,10 +3,8 @@ import json
 from pathlib import Path
 import psutil
 
-# Define the directory and file path
-USER_DOCUMENTS_DIR = Path.home() / 'Documents'
-SETTINGS_DIR = USER_DOCUMENTS_DIR / 'ffishstix'
-SETTINGS_FILE = SETTINGS_DIR / 'settings.fish'
+
+docDir = Path.home() / 'Documents'
 
 
 class bcolors:
@@ -24,7 +22,6 @@ class bcolors:
         self.WARNING = ''
         self.FAIL = ''
         self.ENDC = ''
-
 def getMemoryAvaiable():
     return psutil.virtual_memory().available
 def getInputInt(prompt, min=1, max=2, default=min):
@@ -66,21 +63,18 @@ def getSplitFileSize(fromFileSize):
         comp1 = x < fromFileSize
         comp2 = x < memory
         if comp1 and comp2:
-            amountOfFiles = (fromFileSize // x) + 1
+            """amountOfFiles = (fromFileSize // x) + 1
             last = fromFileSize% x
             print(f"there will be {amountOfFiles} files, at {x}bytes")
             print(f"apart from the last file which will be {last}bytes")
             
             y = input("enter to continue> ")
-            if  not y or y.strip() == "":
-                isValid = True
-
+            if  not y or y.strip() == "": ###### dont need this in setup
+                isValid = True"""
+            isValid = True
             
         else:
-            if not comp1:
-
-                print(f"smaller file size cannot exceed original file size: {fromFileSize}")    
-                print(f"you selected {x}, that is {x - fromFileSize} more than the original size")
+            # removed because the getIntInput already checks for this, should have realised sooner
             if not comp2:
                 print(f"make sure you have adequate memory: {memory/1000000000}GB's")
 
@@ -100,11 +94,11 @@ def getToFolder():
                     Path(toLocation).mkdir(parents=True, exist_ok=True)
                     isValid = True
         else:
-            print(f"\npress enter to continue with default (C:/ProgramData/python)")
+            print(f"\npress enter to continue with default ({docDir}/ffishstix)")
             print("or press any key and then press enter to reenter")
             x = input("> ")
             if not toLocation or toLocation.strip() == "":
-                toLocation = "C:/ProgramData/python"
+                toLocation = f"{docDir}/ffishstix"
                 isValid = True
                 
     return toLocation                     
@@ -137,50 +131,51 @@ def getFromFile():
         if count >= 3 and not isValid:
             print("\nYou may need to remember these crucial things:\n1. When inputting location remember to remove apostrophes.\n2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.\n3. When inputting name remember to include the .txt extension.\nIf you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n")
     return final
-def getToTotal():
+def getToTotal(fromFile):
     toLocation = getToFolder()
+    fromExtension = os.path.splitext(fromFile)[1]
     isValid = False
     while not isValid:
         print("\nthe file wil look something like [prefix] 1,2,3... qaswdtres [suffix]")
-        print("\nthis is because it allows more files to be generated without running into the same file name,\n the qaswdtres are random letters\n that are generated each loop\n leave blank for defaults:\nrandom ammount: 8\nsuffix: file\nprefix: .txt")
+        print(f"\nthis is because it allows more files to be generated without running into the same file name,\n the qaswdtres are random letters\n that are generated each loop\n leave blank for defaults:\nrandom ammount: 8\nsuffix: file\nprefix: {fromExtension}")
         randomAmmount = getInputInt("\nenter the length of random characters 2-16> ", 2, 16, 8)
         if not randomAmmount or str(randomAmmount).strip() == "":
             randomAmmount = 8    
+
         print("\nspecify file prefix")
         prefix = input("> ")
         if not prefix or prefix.strip() == "":
             print("default selected (file)")
+
         print("\n specify file suffix")        
         suffix = input("> ")
         if not suffix or suffix.strip() == "":
             print("default selected (.txt)")
+            suffix = f"{fromExtension}"
         if stringInFile(suffix):
             toLocation = [prefix, toLocation, suffix]
             isValid = True
         else:
             isValid = False
 
-
     return toLocation        
 def getSizeFile(file):
     return os.path.getsize(file)
 def deleteOldFileQuestion(file): 
-    return getInputInt(f"would you like to delete {file} after the split (default=no)\n1, no\n2, yes", 1, 2,1) == 2
+    return getInputInt(f"would you like to delete {file} after the split (default=no)\n1, no\n2, yes\n> ", 1, 2,1) == 2
 
  
 
 def create(file, data):
+    file = f"{file}/settings.txt"
     if not os.path.exists(file):
         with open(file, "w") as ffile:
-            ffile.write(data)
+            ffile.write(str(data))
 
     else:
         print("file already exists,\nyou can find in your documents/ffishstix/settings.fish delete and press enter")   
         x = input("enter to continue>")
         mainloop()
-             
-
-
 def settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete):
     settings = {
         "prefix": prefix,
@@ -192,34 +187,20 @@ def settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, dele
         "delete": delete
     }
     return settings
-
 def get_setting(file, key):
     settings = open(file,"r")
     return settings.get(key)
-
 def mainloop():
     fromFile = getFromFile()
-    arr = getToTotal()
+    arr = getToTotal(fromFile)
     prefix = arr[0]
     toLocation = arr[1]
     suffix = arr[2]
     fromFileSize = getSizeFile(fromFile)
     chunkSize = getSplitFileSize(fromFileSize)
     delete = deleteOldFileQuestion(fromFile)    
-    chunkSize = getSplitFileSize()
-    delete = deleteOldFileQuestion()
-
     # Store the settings
-    settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete)
-
-    # Load and print all settings
-    settings = load_settings()
-    print("All settings:", settings)
-
-    # Access and print specific settings
-    print("Piece:", get_setting("piece"))
-    print("To Location:", get_setting("toLocation"))
-    print("Prefix:", get_setting("prefix"))
-    print("Suffix:", get_setting("suffix"))
-    print("Size:", get_setting("size"))
-    print("Chunk Size:", get_setting("chunkSize"))
+    x = settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete)
+    print(docDir)
+    create(docDir, x)
+mainloop()
