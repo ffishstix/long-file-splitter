@@ -6,7 +6,7 @@ import psutil
 from pathlib import Path
 global bcolors
 from alive_progress import *
-
+start = time.time()
 
 class bcolors:
     HEADER = '\033[95m'
@@ -197,13 +197,7 @@ def getInfo():
 def randomVar(length=8):
     return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
 
-def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):
-    placements = int(size)//int(chunkSize)
-    if count % 25 == 0:
-        clear = lambda: os.system('cls')
-        clear()
-        print(f"{round(((placements - count)/placements) * 100, 2)}% left \n")
-    
+def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):    
     
     if not os.path.exists(toLocation):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
@@ -230,7 +224,10 @@ def deleteOldFile(file):
         print(f"{file} removed")
     else:
         print(f"could not find {file}\n possible reasons for this are:\n 1, the file is already deleted \n 2, the file is corrupt\n> ")        
-    
+def finish(start):
+    end = time.time()
+    print(f"operation finished:\n total time taken = {round((end-start),2)} seconds")
+    x = input("press enter to continue> ")     
 def mainloop():
     temp = getInfo()
     file = temp[0]
@@ -242,17 +239,23 @@ def mainloop():
     chunkSize = temp[3]
     delete = temp[4]
     count = 0
-    placements = int(size)//int(chunkSize)
-    
-    with alive_bar(size // chunkSize) as bar:
+    clear = lambda: os.system('cls')
+    clear()
+    print(f"process started (ctrl + c to cancel), bar below: ")
+    with alive_bar(size // chunkSize+1) as bar:
+        try:
 
-        with open(file) as f:
-            for piece in readInChunks(f, chunkSize):
-                count += 1
-                place(piece, toLocation, prefix, suffix, size, chunkSize, count)
-                bar()
+            with open(file) as f:
+                for piece in readInChunks(f, chunkSize):
+                    count += 1
+                    place(piece, toLocation, prefix, suffix, size, chunkSize, count)
+                    bar()
+        except KeyboardInterrupt:
+            print("cancelled") 
+            delet = False           
     if delete:
         deleteOldFile(file)        
             
 mainloop()
-x = input("enter to exit program> ")
+
+finish(start)
