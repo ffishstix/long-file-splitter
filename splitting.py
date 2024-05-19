@@ -205,10 +205,8 @@ def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):
     fileName = os.path.join(toLocation, f"{prefix}{str(count)}{randomVar(8)}{suffix}")
     while os.path.isfile(fileName):
         fileName = os.path.join(toLocation, f"{prefix}{str(count)}{randomVar(8)}{suffix}")
-    j = open(fileName, "x")
-    j.write(chunk)
-    j.close()
-    
+    with open(fileName, "x") as file:
+        file.write(chunk)
       
 
 def readInChunks(file, chunkSize=32767):
@@ -255,7 +253,7 @@ def mainloop():
             delet = False           
     if delete:
         deleteOldFile(file)        
-            
+
 mainloop()
 
 finish(start)

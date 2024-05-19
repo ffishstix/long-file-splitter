@@ -24,45 +24,9 @@ class bcolors:
         self.WARNING = ''
         self.FAIL = ''
         self.ENDC = ''
-# Ensure the settings directory exists
+
 def getMemoryAvaiable():
     return psutil.virtual_memory().available
-def ensure_settings_dir():
-    if not SETTINGS_DIR.exists():
-        SETTINGS_DIR.mkdir(parents=True, exist_ok=True)
-
-# Ensure the settings file exists
-def ensure_settings_file():
-    ensure_settings_dir()
-    if not SETTINGS_FILE.exists():
-        with open(SETTINGS_FILE, 'w') as file:
-            json.dump({}, file)
-
-# Store settings in the settings file
-def store_settings(toLocation, prefix, suffix, chunkSize, delete):
-    settings = {
-        "toLocation": toLocation,
-        "prefix": prefix,
-        "suffix": suffix,
-        "chunkSize": chunkSize,
-        "delete": delete
-    }
-    ensure_settings_file()
-    with open(SETTINGS_FILE, 'w') as file:
-        json.dump(settings, file)
-
-# Load settings from the settings file
-def load_settings():
-    ensure_settings_file()
-    with open(SETTINGS_FILE, 'r') as file:
-        settings = json.load(file)
-    return settings
-
-# Access specific settings
-def get_setting(key):
-    settings = load_settings()
-    return settings.get(key)
-
 def getInputInt(prompt, min=1, max=2, default=min):
     while True:
         userInput = input(prompt)
@@ -81,7 +45,6 @@ def getInputInt(prompt, min=1, max=2, default=min):
         else:
             print(f"{bcolors.FAIL}Invalid value{bcolors.ENDC} - please enter a integer between {min} and {max}")
     return userInput      
-
 def stringInFile(strSearch, filePath="fileExtensions.txt"):
     try:
         with open(filePath, 'r') as file:
@@ -95,7 +58,6 @@ def stringInFile(strSearch, filePath="fileExtensions.txt"):
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
-
 def getSplitFileSize(fromFileSize):
     isValid = False
     while not isValid:
@@ -123,7 +85,6 @@ def getSplitFileSize(fromFileSize):
                 print(f"make sure you have adequate memory: {memory/1000000000}GB's")
 
     return x        
-
 def getToFolder():
     isValid = False
     toLocation = None
@@ -147,7 +108,6 @@ def getToFolder():
                 isValid = True
                 
     return toLocation                     
-
 def getFromFile():
     count = 0
     final = None
@@ -177,7 +137,6 @@ def getFromFile():
         if count >= 3 and not isValid:
             print("\nYou may need to remember these crucial things:\n1. When inputting location remember to remove apostrophes.\n2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.\n3. When inputting name remember to include the .txt extension.\nIf you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n")
     return final
-
 def getToTotal():
     toLocation = getToFolder()
     isValid = False
@@ -203,31 +162,55 @@ def getToTotal():
 
 
     return toLocation        
-
 def getSizeFile(file):
     return os.path.getsize(file)
-
 def deleteOldFileQuestion(file): 
     return getInputInt(f"would you like to delete {file} after the split (default=no)\n1, no\n2, yes", 1, 2,1) == 2
-# Example usage
-if __name__ == "__main__":
-    # Example settings to store
-    arr = getToTotal()
-    fromFile = getFromFile()
-    fileSize = getSizeFile(fromFile)
-    arr = getToTotal()
-    chunkSize = getSplitFileSize(fileSize)
-    delete = deleteOldFileQuestion(fromFile)    
 
-    fromFile
+ 
+
+def create(file, data):
+    if not os.path.exists(file):
+        with open(file, "w") as ffile:
+            ffile.write(data)
+
+    else:
+        print("file already exists,\nyou can find in your documents/ffishstix/settings.fish delete and press enter")   
+        x = input("enter to continue>")
+        mainloop()
+             
+
+
+def settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete):
+    settings = {
+        "prefix": prefix,
+        "toLocation": toLocation,
+        "suffix": suffix,
+        "fromFile": fromFile,
+        "fromFileSize": fromFileSize,
+        "chunkSize": chunkSize,
+        "delete": delete
+    }
+    return settings
+
+def get_setting(file, key):
+    settings = open(file,"r")
+    return settings.get(key)
+
+def mainloop():
+    fromFile = getFromFile()
+    arr = getToTotal()
     prefix = arr[0]
     toLocation = arr[1]
     suffix = arr[2]
+    fromFileSize = getSizeFile(fromFile)
+    chunkSize = getSplitFileSize(fromFileSize)
+    delete = deleteOldFileQuestion(fromFile)    
     chunkSize = getSplitFileSize()
     delete = deleteOldFileQuestion()
 
     # Store the settings
-    store_settings(fromFile, toLocation, prefix, suffix, chunkSize, delete)
+    settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete)
 
     # Load and print all settings
     settings = load_settings()
