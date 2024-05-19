@@ -4,6 +4,27 @@ import string
 import random
 import psutil
 from pathlib import Path
+global bcolors
+from alive_progress import *
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
+    def disable(self):
+        self.HEADER = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
+
+
 def getMemoryAvaiable():
     return psutil.virtual_memory().available
 def stringInFile(strSearch, filePath="fileExtensions.txt"):
@@ -28,18 +49,15 @@ def getInputInt(prompt, min=1, max=2, default=min):
         except ValueError:
             if not userInput or str(userInput).strip() == "":
                 userInput = default
-                print(default == 1)
-                print(default)
-                print("here")
                 break
             else:
-                print('Invalid value - Please enter a whole number')
+                print(f'{bcolors.FAIL}Invalid value{bcolors.ENDC} - Please enter a whole number')
                 continue
 
         if min <= userInput <= max:
             break
         else:
-            print(f"Invalid value - please enter a integer between {min} and {max}")
+            print(f"{bcolors.FAIL}Invalid value{bcolors.ENDC} - please enter a integer between {min} and {max}")
     return userInput      
 
 def getSizeFile(file):
@@ -79,7 +97,7 @@ def getToFolder():
     toLocation = None
     while not isValid:
 
-        toLocation = input("\n\nfile location to deposit broken down file\nmust look like:\n[drive]:/[folder]/[folder]\n> ")
+        toLocation = input(f"\n\nfile location to deposit broken down file\nmust look like:\n{bcolors.OKBLUE}[drive]:/[folder]/[folder]{bcolors.ENDC}\n> ")
         if  toLocation or toLocation.strip() != "":
             if os.path.isdir(toLocation):
                 isValid = True
@@ -136,7 +154,7 @@ def getSplitFileSize(fromFileSize):
             last = fromFileSize% x
             print(f"there will be {amountOfFiles} files, at {x}bytes")
             print(f"apart from the last file which will be {last}bytes")
-            time.sleep(0.2)
+            
             y = input("enter to continue> ")
             if  not y or y.strip() == "":
                 isValid = True
@@ -165,11 +183,10 @@ def getInfo():
         delete = deleteOldFileQuestion(fromFile)
         arr = [fromFile, fileSize, toLocation, chunkSize, delete]
         print(f"\n\n\n the file location of your large file: {fromFile}")
-        time.sleep(0.4)
         print(f"\n\n the file location of your smaller file: {toLocation[1]}")
-        time.sleep(0.4)
+        
         print(f"\n\n the size of each smaller files: {chunkSize} bytes")
-        time.sleep(0.4)
+        
         print("\n if you are alright with this press enter")
         x = input("otherwise press anykey and then enter> ")
         if not x or x.strip() == "":
@@ -179,24 +196,26 @@ def getInfo():
 
 def randomVar(length=8):
     return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
+
 def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):
     placements = int(size)//int(chunkSize)
-    if placements == 1 and count==1:
-        closeImediately = True
-    else:
-        closeImediately = False    
+    if count % 25 == 0:
+        clear = lambda: os.system('cls')
+        clear()
+        print(f"{round(((placements - count)/placements) * 100, 2)}% left \n")
+    
+    
     if not os.path.exists(toLocation):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
     
     fileName = os.path.join(toLocation, f"{prefix}{str(count)}{randomVar(8)}{suffix}")
     while os.path.isfile(fileName):
         fileName = os.path.join(toLocation, f"{prefix}{str(count)}{randomVar(8)}{suffix}")
-    j = open(fileName, "x")   
+    j = open(fileName, "x")
     j.write(chunk)
+    j.close()
     
-    if closeImediately or placements == count:
-        print("file closed")
-        j.close()      
+      
 
 def readInChunks(file, chunkSize=32767):
     while True:
@@ -223,11 +242,15 @@ def mainloop():
     chunkSize = temp[3]
     delete = temp[4]
     count = 0
-    with open(file) as f:
-        for piece in readInChunks(f, chunkSize):
-            count += 1
-            place(piece, toLocation, prefix, suffix, size, chunkSize, count)
+    placements = int(size)//int(chunkSize)
+    
+    with alive_bar(size // chunkSize) as bar:
 
+        with open(file) as f:
+            for piece in readInChunks(f, chunkSize):
+                count += 1
+                place(piece, toLocation, prefix, suffix, size, chunkSize, count)
+                bar()
     if delete:
         deleteOldFile(file)        
             
