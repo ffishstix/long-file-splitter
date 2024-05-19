@@ -1,10 +1,14 @@
 import os
-
+import time
 import string
 import random
 import psutil
 from pathlib import Path
 global bcolors
+from alive_progress import *
+
+def timeMs():
+    return time.time()
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -20,6 +24,7 @@ class bcolors:
         self.WARNING = ''
         self.FAIL = ''
         self.ENDC = ''
+
 print(f"{bcolors.FAIL}hallo{bcolors.ENDC}")
 
 def getMemoryAvaiable():
@@ -193,24 +198,32 @@ def getInfo():
 
 def randomVar(length=8):
     return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
+
+def compute(count, placements):
+
+    with alive_bar(count) as bar:  # your expected total
+        for item in items:        # the original loop
+            print(item)           # your actual processing here
+            bar()  
 def place(chunk, toLocation, prefix, suffix, size, chunkSize, count=0):
     placements = int(size)//int(chunkSize)
-    if placements == 1 and count==1:
-        closeImediately = True
-    else:
-        closeImediately = False    
+    if count % 25 == 0:
+        clear = lambda: os.system('cls')
+        clear()
+        print(f"{round(((placements - count)/placements) * 100, 2)}% left \n")
+    
+    
     if not os.path.exists(toLocation):
         Path(toLocation).mkdir(parents=True, exist_ok=True)
     
     fileName = os.path.join(toLocation, f"{prefix}{str(count)}{randomVar(8)}{suffix}")
     while os.path.isfile(fileName):
         fileName = os.path.join(toLocation, f"{prefix}{str(count)}{randomVar(8)}{suffix}")
-    j = open(fileName, "x")   
+    j = open(fileName, "x")
     j.write(chunk)
+    j.close()
     
-    if closeImediately or placements == count:
-        print("file closed")
-        j.close()      
+      
 
 def readInChunks(file, chunkSize=32767):
     while True:
@@ -237,11 +250,15 @@ def mainloop():
     chunkSize = temp[3]
     delete = temp[4]
     count = 0
-    with open(file) as f:
-        for piece in readInChunks(f, chunkSize):
-            count += 1
-            place(piece, toLocation, prefix, suffix, size, chunkSize, count)
+    placements = int(size)//int(chunkSize)
+    
+    with alive_bar(size // chunkSize) as bar:
 
+        with open(file) as f:
+            for piece in readInChunks(f, chunkSize):
+                count += 1
+                place(piece, toLocation, prefix, suffix, size, chunkSize, count)
+                bar()
     if delete:
         deleteOldFile(file)        
             
