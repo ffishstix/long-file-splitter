@@ -2,11 +2,13 @@ import os
 import time
 import string
 import random
+import ast
 import psutil
 from pathlib import Path
 global bcolors
 from alive_progress import *
 start = time.time()
+docDir = Path.home() / 'Documents'
 
 class bcolors:
     HEADER = '\033[95m'
@@ -59,7 +61,7 @@ def getInputInt(prompt, min=1, max=2, default=min):
         else:
             print(f"{bcolors.FAIL}Invalid value{bcolors.ENDC} - please enter a integer between {min} and {max}")
     return userInput      
-
+"""
 def getSizeFile(file):
     return os.path.getsize(file)
 def getFromFile():
@@ -193,6 +195,29 @@ def getInfo():
             break
 
     return arr
+"""
+def setting(file, key):
+    settings = open(file,"r")
+
+def getInfo():
+    
+    path = f"{docDir}/ffishstix/settings.fish"
+    if os.path.exists(path):
+        
+        prefix = setting(path, "refix") 
+        toLocation = setting(path, "toLocation")
+        suffix = setting(path, "suffix")
+        fromFile = setting(path, "fromFile")
+        fromFileSize = setting(path, "fromFileSize")
+        chunkSize = setting(path, "chunkSize")
+        delete = setting(path, "delete")
+    else:
+        print("run setup.py and rerun")
+        exit(0)
+
+    arr = [prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete]       
+    return arr
+
 
 def randomVar(length=8):
     return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
@@ -228,31 +253,30 @@ def finish(start):
     x = input("press enter to continue> ")     
 def mainloop():
     temp = getInfo()
-    file = temp[0]
-    size = temp[1]
-    arrtoLocation = temp[2]
-    prefix = arrtoLocation[0]
-    suffix = arrtoLocation[2]
-    toLocation = arrtoLocation[1]
-    chunkSize = temp[3]
-    delete = temp[4]
+    prefix = temp[0]
+    toLocation = temp[1]
+    suffix = temp[2]
+    fromFile = temp[3]
+    fromFileSize = temp[4]
+    chunkSize = temp[5]
+    delete = temp[6]
     count = 0
     clear = lambda: os.system('cls')
     clear()
     print(f"process started (ctrl + c to cancel), bar below: ")
-    with alive_bar(size // chunkSize+1) as bar:
+    with alive_bar(fromFileSize // chunkSize+1) as bar:
         try:
 
-            with open(file) as f:
+            with open(fromFile) as f:
                 for piece in readInChunks(f, chunkSize):
                     count += 1
-                    place(piece, toLocation, prefix, suffix, size, chunkSize, count)
+                    place(piece, toLocation, prefix, suffix, fromFile, chunkSize, count)
                     bar()
         except KeyboardInterrupt:
             print("cancelled") 
             delet = False           
     if delete:
-        deleteOldFile(file)        
+        deleteOldFile(fromFileSize)        
 
 mainloop()
 

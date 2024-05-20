@@ -192,7 +192,10 @@ def get_setting(file, key):
     return settings.get(key)
 def mainloop():
     fromFile = getFromFile()
-    arr = getToTotal(fromFile)
+    for i in fromFile:
+        if i == None:
+            print("one of your answers was null, reenter")
+    arr = getToTotal(fromFile)  
     prefix = arr[0]
     toLocation = arr[1]
     suffix = arr[2]
@@ -201,6 +204,7 @@ def mainloop():
     delete = deleteOldFileQuestion(fromFile)    
     # Store the settings
     x = settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete)
-    print(docDir)
+    
     create(docDir, x)
 mainloop()
+print(f"you can find the settings in {docDir}")
