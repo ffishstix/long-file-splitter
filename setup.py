@@ -188,9 +188,7 @@ def settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, dele
         "delete": delete
     }
     return settings
-def get_setting(file, key):
-    settings = open(file,"r")
-    return settings.get(key)
+
 def mainloop():
     
     while os.path.exists(docFile):
