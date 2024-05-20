@@ -4,6 +4,7 @@ import string
 import random
 import ast
 import psutil
+import json
 from pathlib import Path
 global bcolors
 from alive_progress import *
@@ -197,12 +198,15 @@ def getInfo():
 
     return arr
 """
-def setting(file, key):
-    settings = open(file,"r")
+
+
+def loadSettings(file):
+    with open(file, 'r') as f:
+        return json.load(f)
 
 def getInfo():
     if os.path.exists(docFile):
-        
+        setting = loadSettings(docFile)
         prefix = setting(docFile, "refix") 
         toLocation = setting(docFile, "toLocation")
         suffix = setting(docFile, "suffix")
@@ -213,9 +217,7 @@ def getInfo():
     else:
         print("run setup.py and rerun")
         exit(0)
-
-    arr = [prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete]       
-    return arr
+    return [prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete]
 
 
 def randomVar(length=8):
@@ -252,13 +254,14 @@ def finish(start):
     x = input("press enter to continue> ")     
 def mainloop():
     temp = getInfo()
+    print(temp)
     prefix = temp[0]
     toLocation = temp[1]
     suffix = temp[2]
     fromFile = temp[3]
-    fromFileSize = temp[4]
-    chunkSize = temp[5]
-    delete = temp[6]
+    fromFileSize = int(temp[4])
+    chunkSize = int(temp[5])
+    delete = bool(temp[6])
     count = 0
     clear = lambda: os.system('cls')
     clear()

@@ -3,9 +3,8 @@ import json
 from pathlib import Path
 import psutil
 
-
-docFile = Path.home() / 'Documents' / 'ffishstix' / 'settings.fish'
 docDir = Path.home() / 'Documents' / 'ffishstix'
+docFile = docDir / 'settings.fish'
 
 class bcolors:
     HEADER = '\033[95m'
