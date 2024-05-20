@@ -4,8 +4,8 @@ from pathlib import Path
 import psutil
 
 
-docDir = Path.home() / 'Documents'
-
+docFile = Path.home() / 'Documents' / 'ffishstix' / 'settings.fish'
+docDir = Path.home() / 'Documents' / 'ffishstix'
 
 class bcolors:
     HEADER = '\033[95m'
@@ -94,11 +94,11 @@ def getToFolder():
                     Path(toLocation).mkdir(parents=True, exist_ok=True)
                     isValid = True
         else:
-            print(f"\npress enter to continue with default ({docDir}/ffishstix)")
+            print(f"\npress enter to continue with default ({docDir})")
             print("or press any key and then press enter to reenter")
             x = input("> ")
             if not x or x.strip() == "":
-                toLocation = f"{docDir}/ffishstix"
+                toLocation = f"{docDir}"
                 isValid = True
                 
     return toLocation                     
@@ -166,19 +166,18 @@ def getSizeFile(file):
     return os.path.getsize(file)
 def deleteOldFileQuestion(file): 
     return getInputInt(f"would you like to delete {file} after the split (default=no)\n1, no\n2, yes\n> ", 1, 2,1) == 2
-
-def fileExists(file):
-    return os.path.exists(file)
 def create(file, data):
-    file = f"{file}/settings.txt"
-    if not fileExists(file):
-        with open(file, "w") as ffile:
-            ffile.write(str(data))
+    while True:
+        if not os.path.exists(file):
+            docDir.mkdir(parents=True, exist_ok=True)
+            with open(file, "w") as ffile:
+                ffile.write(str(data))
+                break
 
-    else:
-        print(f"file already exists,\nyou can find in {file} delete and press enter")   
-        x = input("enter to continue>")
-        mainloop()
+        else:
+            print(f"file already exists,\nyou can find in {file} delete and press enter")   
+            x = input("enter to continue>")
+        
 def settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete):
     settings = {
         "prefix": prefix,
@@ -194,11 +193,13 @@ def get_setting(file, key):
     settings = open(file,"r")
     return settings.get(key)
 def mainloop():
-    file = f"{docDir}/ffishstix/settings.fish"
-    while not fileExists(file):
+    
+    while os.path.exists(docFile):
         print(f"setting file exists, you must delete before continuing")
         print("")
-        x = fileExists(file)
+        print(docFile)
+        x = input()
+        
 
     fromFile = getFromFile()
     for i in fromFile:
@@ -214,6 +215,6 @@ def mainloop():
     # Store the settings
     x = settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete)
     
-    create(docDir, x)
+    create(docFile, x)
 mainloop()
-print(f"you can find the settings in {docDir}")
+print(f"you can find the settings in {docFile}")
