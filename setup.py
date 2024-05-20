@@ -167,10 +167,11 @@ def getSizeFile(file):
 def deleteOldFileQuestion(file): 
     return getInputInt(f"would you like to delete {file} after the split (default=no)\n1, no\n2, yes\n> ", 1, 2,1) == 2
 
- 
+def fileExists(file):
+    return os.path.exists(file)
 def create(file, data):
     file = f"{file}/settings.txt"
-    if not os.path.exists(file):
+    if not fileExists(file):
         with open(file, "w") as ffile:
             ffile.write(str(data))
 
@@ -193,6 +194,12 @@ def get_setting(file, key):
     settings = open(file,"r")
     return settings.get(key)
 def mainloop():
+    file = f"{docDir}/ffishstix/settings.fish"
+    while not fileExists(file):
+        print(f"setting file exists, you must delete before continuing")
+        print("")
+        x = fileExists(file)
+
     fromFile = getFromFile()
     for i in fromFile:
         if i == None:

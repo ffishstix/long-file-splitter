@@ -2445,3 +2445,4 @@
 .zh.html
 .zhtml
 .zip.php
+.fish
