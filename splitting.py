@@ -8,7 +8,8 @@ from pathlib import Path
 global bcolors
 from alive_progress import *
 start = time.time()
-docDir = Path.home() / 'Documents'
+docDir = Path.home() / 'Documents' / 'ffishstix'
+docFile = Path.home() / 'documents' / 'ffishstix' / 'settings.fish'
 
 class bcolors:
     HEADER = '\033[95m'
@@ -200,17 +201,15 @@ def setting(file, key):
     settings = open(file,"r")
 
 def getInfo():
-    
-    path = f"{docDir}/ffishstix/settings.fish"
-    if os.path.exists(path):
+    if os.path.exists(docFile):
         
-        prefix = setting(path, "refix") 
-        toLocation = setting(path, "toLocation")
-        suffix = setting(path, "suffix")
-        fromFile = setting(path, "fromFile")
-        fromFileSize = setting(path, "fromFileSize")
-        chunkSize = setting(path, "chunkSize")
-        delete = setting(path, "delete")
+        prefix = setting(docFile, "refix") 
+        toLocation = setting(docFile, "toLocation")
+        suffix = setting(docFile, "suffix")
+        fromFile = setting(docFile, "fromFile")
+        fromFileSize = setting(docFile, "fromFileSize")
+        chunkSize = setting(docFile, "chunkSize")
+        delete = setting(docFile, "delete")
     else:
         print("run setup.py and rerun")
         exit(0)
