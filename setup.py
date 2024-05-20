@@ -97,7 +97,7 @@ def getToFolder():
             print(f"\npress enter to continue with default ({docDir}/ffishstix)")
             print("or press any key and then press enter to reenter")
             x = input("> ")
-            if not toLocation or toLocation.strip() == "":
+            if not x or x.strip() == "":
                 toLocation = f"{docDir}/ffishstix"
                 isValid = True
                 
@@ -136,21 +136,24 @@ def getToTotal(fromFile):
     fromExtension = os.path.splitext(fromFile)[1]
     isValid = False
     while not isValid:
-        print("\nthe file wil look something like [prefix] 1,2,3... qaswdtres [suffix]")
+        print("\nthe output file wil look something like [prefix] 1,2,3... qaswdtres [suffix]")
         print(f"\nthis is because it allows more files to be generated without running into the same file name,\n the qaswdtres are random letters\n that are generated each loop\n leave blank for defaults:\nrandom ammount: 8\nsuffix: file\nprefix: {fromExtension}")
         randomAmmount = getInputInt("\nenter the length of random characters 2-16> ", 2, 16, 8)
         if not randomAmmount or str(randomAmmount).strip() == "":
             randomAmmount = 8    
+            print(f"default selected ({randomAmmount})")
 
         print("\nspecify file prefix")
         prefix = input("> ")
         if not prefix or prefix.strip() == "":
             print("default selected (file)")
+            prefix = "file"
 
         print("\n specify file suffix")        
         suffix = input("> ")
         if not suffix or suffix.strip() == "":
             print("default selected (.txt)")
+            
             suffix = f"{fromExtension}"
         if stringInFile(suffix):
             toLocation = [prefix, toLocation, suffix]
@@ -165,7 +168,6 @@ def deleteOldFileQuestion(file):
     return getInputInt(f"would you like to delete {file} after the split (default=no)\n1, no\n2, yes\n> ", 1, 2,1) == 2
 
  
-
 def create(file, data):
     file = f"{file}/settings.txt"
     if not os.path.exists(file):
@@ -173,7 +175,7 @@ def create(file, data):
             ffile.write(str(data))
 
     else:
-        print("file already exists,\nyou can find in your documents/ffishstix/settings.fish delete and press enter")   
+        print(f"file already exists,\nyou can find in {file} delete and press enter")   
         x = input("enter to continue>")
         mainloop()
 def settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete):
