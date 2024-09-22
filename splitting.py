@@ -207,7 +207,7 @@ def loadSettings(file):
 def getInfo():
     if os.path.exists(docFile):
         setting = loadSettings(docFile)
-        prefix = setting(docFile, "refix") 
+        prefix = setting(docFile, "prefix") 
         toLocation = setting(docFile, "toLocation")
         suffix = setting(docFile, "suffix")
         fromFile = setting(docFile, "fromFile")

@@ -1,7 +1,6 @@
 import os
 import json
 from pathlib import Path
-import psutil
 
 docDir = Path.home() / 'Documents' / 'ffishstix'
 docFile = docDir / 'settings.fish'
@@ -21,8 +20,7 @@ class bcolors:
         self.WARNING = ''
         self.FAIL = ''
         self.ENDC = ''
-def getMemoryAvaiable():
-    return psutil.virtual_memory().available
+
 def getInputInt(prompt, min=1, max=2, default=min):
     while True:
         userInput = input(prompt)
@@ -55,35 +53,21 @@ def stringInFile(strSearch, filePath="fileExtensions.txt"):
         print(f"An error occurred: {e}")
         return False
 def getSplitFileSize(fromFileSize):
-    isValid = False
-    while not isValid:
-        x = getInputInt("\nenter size of smaller files in bytes> ", 1, fromFileSize-1, 50000)
-        memory = getMemoryAvaiable()
-        comp1 = x < fromFileSize
-        comp2 = x < memory
-        if comp1 and comp2:
-            """amountOfFiles = (fromFileSize // x) + 1
-            last = fromFileSize% x
-            print(f"there will be {amountOfFiles} files, at {x}bytes")
-            print(f"apart from the last file which will be {last}bytes")
-            
-            y = input("enter to continue> ")
-            if  not y or y.strip() == "": ###### dont need this in setup
-                isValid = True"""
-            isValid = True
-            
-        else:
-            # removed because the getIntInput already checks for this, should have realised sooner
-            if not comp2:
-                print(f"make sure you have adequate memory: {memory/1000000000}GB's")
-
+    while True:
+        x = getInputInt(f"\nenter size of smaller files in bytes {bcolors.WARNING}(default= 50kb){bcolors.ENDC}\n> ", 1, fromFileSize-1, 50000)
+        print(f"{bcolors.FAIL}as a safety measure, please make sure that you have more memory \nthan the size of each smaller file in bytes{bcolors.ENDC}")
+        y = input(f"{bcolors.FAIL}press enter to contine: {bcolors.ENDC}")
+        break
     return x        
-def getToFolder():
+def getToFolder(form):
     isValid = False
     toLocation = None
     while not isValid:
 
-        toLocation = input(f"\n\nfile location to deposit broken down file\nmust look like:\n{bcolors.OKBLUE}[drive]:/[folder]/[folder]{bcolors.ENDC}\n> ")
+        toLocation = input(f"\n\nfile location to deposit broken down file\nmust look like:\n{bcolors.OKBLUE}[drive]:/[folder]/[folder]{bcolors.ENDC}\nor you could press {bcolors.OKBLUE}enter{bcolors.ENDC} for the same location\n> ")
+        if not toLocation or toLocation.strip() == "":
+            toLocation = os.path.dirname(form)
+            print(toLocation)
         if  toLocation or toLocation.strip() != "":
             if os.path.isdir(toLocation):
                 isValid = True
@@ -104,34 +88,46 @@ def getToFolder():
 def getFromFile():
     count = 0
     final = None
-    isValid = False
-    while not isValid:
+
+    while True:
         count += 1
         print("please input the file that you would like to split")
+        print(f"it should look like: {bcolors.OKBLUE}[drive]:/[folder]/[folder]/[file.suffex]{bcolors.ENDC}")
+        print(f"or you could press {bcolors.OKGREEN}enter{bcolors.ENDC} to give the options: \n{bcolors.OKBLUE}[drive]:/[folder]/[folder]\n{bcolors.ENDC}and then {bcolors.OKBLUE}[file.suffex]{bcolors.ENDC}")
         final = input("\nEnter full file name, including file location, if easier leave blank (will get more options)> ")
         
         if not final or final.strip() == "":
-            y = input("Enter file location> ")
-            x = input("Enter file name> ")
+            y = input(f"Enter file location {bcolors.OKBLUE}[drive]:/[folder]/[folder]\n{bcolors.ENDC}> ")
+            x = input(f"Enter file name {bcolors.OKBLUE}[file.suffex]{bcolors.ENDC}> ")
 
             if os.path.isdir(y) and os.path.isfile(os.path.join(y, x)):
                 final = os.path.join(y, x)
-                isValid = True
+                print("file found, saved")
+                break
             elif os.path.isfile(x):
                 final = x
-                isValid = True
+                print("file found, saved")
+                break
             elif os.path.isfile(os.path.join(y, x)):
                 final = os.path.join(y, x)
-                isValid = True
+                print("file found, saved")
+                break
         else:
             print(final)
             if os.path.isfile(final):
-                isValid = True
-        if count >= 3 and not isValid:
+                print("file found, saved")
+                break
+            else:
+                print("file was not correct :( please try again: \n")    
+        if count >= 3:
             print("\nYou may need to remember these crucial things:\n1. When inputting location remember to remove apostrophes.\n2. When inputting location remember to include [drive letter]:/[folder]/[folder]/.\n3. When inputting name remember to include the .txt extension.\nIf you do not include the .txt and it is another extension then it will only look for .txt and it will not work.\n")
+        
+        else:
+            print("file was not correct :( please try again: \n")
+    print("")    
     return final
 def getToTotal(fromFile):
-    toLocation = getToFolder()
+    toLocation = getToFolder(fromFile)
     fromExtension = os.path.splitext(fromFile)[1]
     isValid = False
     while not isValid:
@@ -155,7 +151,7 @@ def getToTotal(fromFile):
             
             suffix = f"{fromExtension}"
         if stringInFile(suffix):
-            toLocation = [prefix, toLocation, suffix]
+            toLocation = [prefix, toLocation, suffix, randomAmmount]
             isValid = True
         else:
             isValid = False
@@ -170,14 +166,23 @@ def create(file, data):
         if not os.path.exists(file):
             docDir.mkdir(parents=True, exist_ok=True)
             with open(file, "w") as ffile:
-                ffile.write(str(data))
+                json.dump(data, ffile, indent=4)
                 break
 
         else:
             print(f"file already exists,\nyou can find in {file} delete and press enter")   
             x = input("enter to continue>")
+def remove(file=docFile):
+    
+    try: 
         
-def settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete):
+        os.remove(file)
+        return True
+    
+    except FileNotFoundError:
+        print("file not found ")
+        return False    
+def settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete, randg):
     settings = {
         "prefix": prefix,
         "toLocation": toLocation,
@@ -185,33 +190,56 @@ def settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, dele
         "fromFile": fromFile,
         "fromFileSize": fromFileSize,
         "chunkSize": chunkSize,
-        "delete": delete
+        "delete": delete,
+        "randomAmount": randg,
+        "runNum": 0
     }
     return settings
+def makeNew():
 
-def mainloop():
-    
-    while os.path.exists(docFile):
-        print(f"setting file exists, you must delete before continuing")
-        print("")
-        print(docFile)
-        x = input()
-        
-
-    fromFile = getFromFile()
-    for i in fromFile:
-        if i == None:
-            print("one of your answers was null, reenter")
+    while True:
+        temp = False
+        fromFile = getFromFile()
+        for i in fromFile:
+            if i == None:
+                print("one of your answers was null, reenter \n")
+            else:
+                temp = True
+        if temp:
+            break        
+                
     arr = getToTotal(fromFile)  
     prefix = arr[0]
     toLocation = arr[1]
     suffix = arr[2]
+    randg = arr[3]
     fromFileSize = getSizeFile(fromFile)
     chunkSize = getSplitFileSize(fromFileSize)
     delete = deleteOldFileQuestion(fromFile)    
     # Store the settings
-    x = settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete)
+    x = settings(prefix, toLocation, suffix, fromFile, fromFileSize, chunkSize, delete, randg)
     
     create(docFile, x)
-mainloop()
-print(f"you can find the settings in {docFile}")
+def mainloop():
+    y = False
+    while os.path.exists(docFile):
+        print(f"setting file exists, do you want to delete it?")
+        print(f"{docFile}")
+        x = getInputInt("1, yes. 2, no> ")
+        if x == 1:
+            y = remove()
+        else:
+            print("just to confirm, you want to keep the file? ") 
+            x = getInputInt("1, yes. 2, no> ")
+            if x == 1:
+                print("no need to run setup, just run splitting.py :) ")
+                exit()
+            else:
+                y = remove()
+    
+    makeNew()
+
+
+if __name__ == "__main__":
+    mainloop()
+    print(f"you can find the settings in {docFile}")
